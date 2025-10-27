@@ -5,6 +5,7 @@ import { compare } from "bcryptjs"
 import { UserRole } from "@/types"
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -66,7 +67,7 @@ export const authOptions: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: "/auth/signin",
-    signUp: "/auth/signup"
-  }
+    signIn: "/auth/signin"
+  },
+  debug: process.env.NODE_ENV === "development"
 }
