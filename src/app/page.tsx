@@ -32,13 +32,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="relative w-24 h-24 md:w-32 md:h-32">
-        <img
-          src="/logo.svg"
-          alt="WiFi Payment Manager Logo"
-          className="w-full h-full object-contain"
-        />
-      </div>
+
       
       <div className="text-center max-w-2xl">
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">

@@ -27,9 +27,12 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // For demo purposes, we'll use a simple password check
-        // In production, you should hash passwords properly
-        const isPasswordValid = credentials.password === "password123"
+        // Verify password
+        if (!user.password) {
+          return null
+        }
+
+        const isPasswordValid = await compare(credentials.password, user.password)
 
         if (!isPasswordValid) {
           return null

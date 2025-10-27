@@ -88,9 +88,12 @@ export default function SignInPage() {
             </Button>
           </form>
           
-          <div className="mt-6 text-sm text-muted-foreground">
-            <p className="text-center">
-              Demo: Gunakan password "password123" untuk login
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Belum punya akun?{" "}
+              <a href="/auth/signup" className="text-primary hover:underline">
+                Registrasi di sini
+              </a>
             </p>
           </div>
         </CardContent>
