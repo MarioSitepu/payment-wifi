@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
 import { SessionAuthProvider } from "@/components/providers/session-provider";
 
 const geistSans = Geist({
@@ -46,7 +46,13 @@ export default function RootLayout({
       >
         <SessionAuthProvider>
           {children}
-          <Toaster />
+          <Toaster 
+            position="top-center"
+            expand={true}
+            richColors={true}
+            closeButton={true}
+            duration={5000}
+          />
         </SessionAuthProvider>
       </body>
     </html>
