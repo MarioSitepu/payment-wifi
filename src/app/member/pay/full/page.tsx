@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,6 +33,7 @@ export default function FullPaymentPage() {
   const [amount, setAmount] = useState("")
   const [notes, setNotes] = useState("")
   const [receiptFile, setReceiptFile] = useState<File | null>(null)
+  const [notice, setNotice] = useState<{ type: "success" | "error"; message: string } | null>(null)
 
   useEffect(() => {
     if (status === "loading") return
@@ -73,6 +75,7 @@ export default function FullPaymentPage() {
     e.preventDefault()
 
     if (!bill || !receiptFile) {
+      setNotice({ type: "error", message: "Silakan upload bukti pembayaran" })
       toast.error("Silakan upload bukti pembayaran")
       return
     }
@@ -84,6 +87,7 @@ export default function FullPaymentPage() {
     }
 
     setSubmitting(true)
+    setNotice(null)
 
     try {
       // Upload receipt first
@@ -96,7 +100,8 @@ export default function FullPaymentPage() {
       })
 
       if (!uploadResponse.ok) {
-        throw new Error("Gagal upload bukti pembayaran")
+        const err = await uploadResponse.json().catch(() => ({} as any))
+        throw new Error(err?.message || "Gagal upload bukti pembayaran")
       }
 
       const { receiptUrl } = await uploadResponse.json()
@@ -117,14 +122,20 @@ export default function FullPaymentPage() {
       })
 
       if (paymentResponse.ok) {
-        toast.success("Pembayaran berhasil dikirim! Menunggu verifikasi admin.")
-        router.push("/member")
+        const successMsg = "Pembayaran berhasil dikirim! Menunggu verifikasi admin."
+        setNotice({ type: "success", message: successMsg })
+        toast.success(successMsg)
+        setTimeout(() => router.push("/member"), 1200)
       } else {
         const error = await paymentResponse.json()
-        toast.error(error.message || "Gagal membuat pembayaran")
+        const msg = error.message || "Gagal membuat pembayaran"
+        setNotice({ type: "error", message: msg })
+        toast.error(msg)
       }
     } catch (error) {
-      toast.error("Terjadi kesalahan saat memproses pembayaran")
+      const msg = error instanceof Error ? error.message : "Terjadi kesalahan saat memproses pembayaran"
+      setNotice({ type: "error", message: msg })
+      toast.error(msg)
     } finally {
       setSubmitting(false)
     }
@@ -155,6 +166,14 @@ export default function FullPaymentPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-2xl">
+      {notice && (
+        <div className="mb-4">
+          <Alert variant={notice.type === "error" ? "destructive" : "default"}>
+            <AlertTitle>{notice.type === "error" ? "Gagal" : "Berhasil"}</AlertTitle>
+            <AlertDescription>{notice.message}</AlertDescription>
+          </Alert>
+        </div>
+      )}
       <div className="mb-6">
         <Button 
           variant="outline" 
