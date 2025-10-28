@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { formatCurrency, formatDate } from "@/lib/utils"
 
@@ -31,6 +32,7 @@ export default function PaymentHistoryPage() {
   const router = useRouter()
   const [payments, setPayments] = useState<PaymentWithBill[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === "loading") return
@@ -97,7 +99,7 @@ export default function PaymentHistoryPage() {
   }
 
   const viewReceipt = (receiptUrl: string) => {
-    window.open(receiptUrl, "_blank")
+    setSelectedReceipt(receiptUrl)
   }
 
   if (loading) {
@@ -190,6 +192,24 @@ export default function PaymentHistoryPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Receipt Modal */}
+      <Dialog open={!!selectedReceipt} onOpenChange={() => setSelectedReceipt(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>Bukti Pembayaran</DialogTitle>
+          </DialogHeader>
+          {selectedReceipt && (
+            <div className="flex justify-center">
+              <img 
+                src={selectedReceipt} 
+                alt="Bukti Pembayaran" 
+                className="max-w-full max-h-[70vh] object-contain rounded-lg border"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
