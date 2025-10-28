@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -129,9 +129,8 @@ export default function MemberDashboard() {
         </div>
         <Button 
           variant="outline" 
-          onClick={() => {
-            // Implement logout
-            router.push("/")
+          onClick={async () => {
+            await signOut({ callbackUrl: "/" })
           }}
         >
           Logout
