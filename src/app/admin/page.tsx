@@ -53,7 +53,7 @@ export default function AdminDashboard() {
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null)
   const [filterMonth, setFilterMonth] = useState<number>(new Date().getMonth() + 1)
   const [filterYear, setFilterYear] = useState<number>(new Date().getFullYear())
-  const [unpaid, setUnpaid] = useState<Array<{
+  const [paymentStatuses, setPaymentStatuses] = useState<Array<{
     userId: string
     name: string
     email: string
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
     amount: number | null
     paidApproved: number
     remaining: number | null
-    status: "UNPAID" | "NO_BILL"
+    status: "PAID" | "UNPAID" | "NO_BILL"
   }>>([])
 
   useEffect(() => {
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
       const response = await fetch(`/api/admin/unpaid?month=${filterMonth}&year=${filterYear}`)
       if (response.ok) {
         const data = await response.json()
-        setUnpaid(data.data)
+        setPaymentStatuses(data.data || [])
       }
     } catch (error) {
       // ignore
@@ -320,7 +320,7 @@ export default function AdminDashboard() {
           <TabsTrigger value="approved">Disetujui ({payments.filter(p => p.status === "APPROVED").length})</TabsTrigger>
           <TabsTrigger value="rejected">Ditolak ({payments.filter(p => p.status === "REJECTED").length})</TabsTrigger>
           <TabsTrigger value="all">Semua ({payments.length})</TabsTrigger>
-          <TabsTrigger value="unpaid">Belum Membayar</TabsTrigger>
+          <TabsTrigger value="unpaid">Status Pembayaran</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="space-y-4">
@@ -418,9 +418,9 @@ export default function AdminDashboard() {
         <TabsContent value="unpaid" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Belum Membayar</CardTitle>
+              <CardTitle>Status Pembayaran Member</CardTitle>
               <CardDescription>
-                Daftar member yang belum membayar berdasarkan bulan/tahun
+                Daftar status pembayaran semua member berdasarkan bulan/tahun
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {unpaid.map((u) => (
+                    {paymentStatuses.map((u) => (
                       <TableRow key={u.userId}>
                         <TableCell>{u.name}</TableCell>
                         <TableCell>{u.email}</TableCell>
@@ -474,7 +474,9 @@ export default function AdminDashboard() {
                         <TableCell>{formatCurrency(u.paidApproved)}</TableCell>
                         <TableCell>{u.remaining !== null ? formatCurrency(u.remaining) : '-'}</TableCell>
                         <TableCell>
-                          {u.status === 'NO_BILL' ? (
+                          {u.status === 'PAID' ? (
+                            <Badge className="bg-green-500">Sudah Lunas</Badge>
+                          ) : u.status === 'NO_BILL' ? (
                             <Badge variant="secondary">Belum dibuat</Badge>
                           ) : (
                             <Badge variant="destructive">Belum Lunas</Badge>

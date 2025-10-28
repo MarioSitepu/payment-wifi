@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       orderBy: { email: "asc" }
     })
 
-    const unpaid = members.map((member) => {
+    const memberStatuses = members.map((member) => {
       const bill = member.bills[0]
       if (!bill) {
         return {
@@ -76,14 +76,20 @@ export async function GET(request: NextRequest) {
         isPaid: remaining <= 0,
         status: remaining <= 0 ? "PAID" as const : "UNPAID" as const,
       }
-    }).filter(item => item.status !== "PAID")
+    })
+
+    const paid = memberStatuses.filter(item => item.status === "PAID")
+    const unpaid = memberStatuses.filter(item => item.status === "UNPAID" || item.status === "NO_BILL")
 
     return NextResponse.json({
       month,
       year,
       totalMembers: members.length,
+      totalPaid: paid.length,
       totalUnpaid: unpaid.length,
-      data: unpaid,
+      paid,
+      unpaid,
+      data: memberStatuses, // All statuses for convenience
     })
   } catch (error) {
     console.error("Error fetching unpaid members:", error)
